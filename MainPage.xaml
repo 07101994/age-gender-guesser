@@ -5,9 +5,16 @@
     xmlns:local="using:Win2D_Face"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    mc:Ignorable="d"
+    Loaded="OnLoaded"
+    Unloaded="OnUnloaded">
 
     <Grid x:Name="BackPanel">
-        <Image x:Name="FacePhoto" Stretch="Uniform" Margin="0,0,0,30" Source="assets/happy-people.jpg"/>
+        <CaptureElement x:Name="captureElement" Width="Auto" Height="Auto"/>
+        <TextBlock x:Name="progressText" FontSize="{StaticResource TextStyleLargeFontSize}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <!--<Image x:Name="FacePhoto" Stretch="Uniform" Margin="0,0,0,30" Source="assets/happy-people.jpg"/>-->
+        <Button x:Name="AnalyzeButton" Margin="20,5" Height="40" VerticalAlignment="Bottom" Content="Analyze..." Click="AnalyzeButton_Click"/>
+        <canvas:CanvasControl x:Name="canvasControl" Visibility="Collapsed" Draw="canvasControl_Draw" ClearColor="CornflowerBlue" />
     </Grid>
 </Page>

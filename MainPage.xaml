@@ -9,12 +9,18 @@
     mc:Ignorable="d"
     Loaded="OnLoaded"
     Unloaded="OnUnloaded">
-
+   
     <Grid x:Name="BackPanel">
-        <CaptureElement x:Name="captureElement" Width="Auto" Height="Auto"/>
-        <TextBlock x:Name="progressText" FontSize="{StaticResource TextStyleLargeFontSize}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"/>
-        <!--<Image x:Name="FacePhoto" Stretch="Uniform" Margin="0,0,0,30" Source="assets/happy-people.jpg"/>-->
-        <Button x:Name="AnalyzeButton" Margin="20,5" Height="40" VerticalAlignment="Bottom" Content="Analyze..." Click="AnalyzeButton_Click"/>
-        <canvas:CanvasControl x:Name="canvasControl" Visibility="Collapsed" Draw="canvasControl_Draw" ClearColor="Black" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <CaptureElement Grid.Row="0" x:Name="captureElement" Width="auto" Height="auto"/>
+        <TextBlock Grid.Row="0" x:Name="progressText" FontSize="{StaticResource TextStyleLargeFontSize}" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        <canvas:CanvasControl Grid.Row="0" x:Name="canvasControl" Visibility="Collapsed" Draw="canvasControl_Draw" ClearColor="Black" />
+
+        <Button x:Name="AnalyzeButton" Grid.Row="1" Background="Gray" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Content="Capture Photo" Click="AnalyzeButton_Click" />
     </Grid>
+    
+
 </Page>

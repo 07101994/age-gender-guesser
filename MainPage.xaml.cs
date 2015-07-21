@@ -24,6 +24,9 @@ using Windows.Graphics.Imaging;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using Windows.UI;
+using Microsoft.Graphics.Canvas.Text;
+using Microsoft.Graphics.Canvas.Geometry;
+using System.Numerics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -35,8 +38,11 @@ namespace Win2D_Face
     public sealed partial class MainPage : Page
     {
         private MediaCapture mediaCapture;
-        private IRandomAccessStream capturedPhoto;
         private TaskCompletionSource<object> hasLoaded = new TaskCompletionSource<object>();
+        private Face[] lastCapturedFaces;
+
+        bool inCaptureState = true;
+        bool processingImage = false;
 
         // Win2D stuff
         CanvasBitmap photoCanvasBitmap;
@@ -80,6 +86,7 @@ namespace Win2D_Face
             var settings = new MediaCaptureInitializationSettings()
             {
                 StreamingCaptureMode = StreamingCaptureMode.Video
+
             };
 
             try
@@ -99,7 +106,6 @@ namespace Win2D_Face
             var photoStreamProperties = mediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.Photo);
             IMediaEncodingProperties mediaEncodingProperties = null;
 
-
             foreach (var photoStreamProperty in photoStreamProperties)
             {
                 var videoEncodingProperties = (photoStreamProperty as VideoEncodingProperties);
@@ -117,55 +123,110 @@ namespace Win2D_Face
 
         private async void AnalyzeButton_Click(object sender, RoutedEventArgs e)
         {
-            // Make the 'Processing...' label visible
-            canvasControl.Visibility = Visibility.Visible;
-            canvasControl.Invalidate();
+            if (processingImage)
+            {
+                // Ignore button presses while processing the image
+                return;
+            }
 
-            capturedPhoto = new InMemoryRandomAccessStream();
-            var tempPhoto = new InMemoryRandomAccessStream();
-            await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), tempPhoto);
-            await tempPhoto.FlushAsync();
+            if (inCaptureState)
+            {
+                processingImage = true;
+                inCaptureState = false;
 
-            captureElement.Visibility = Visibility.Collapsed;
+                // Make the 'Processing...' label visible
+                canvasControl.Visibility = Visibility.Visible;
+                AnalyzeButton.Content = "Capture Photo";
 
-            // Project Oxford doesn't like the JPEG that CapturePhotoToStreamAsync creates
-            // It returns an "Image size is too small" error
-            // To workaround this, we have to decode the JPEG, and reencode it again using Windows.Graphics.Imaging
-            // Project Oxford successfully detects faces in the reencoded image
+                canvasControl.Invalidate();
 
-            // Decode the image created by CapturePhotoToStreamAsync
-            BitmapPixelFormat pixelFormat = BitmapPixelFormat.Rgba8;
-            BitmapAlphaMode alphaMode = BitmapAlphaMode.Ignore;
-            var decoder = await BitmapDecoder.CreateAsync(tempPhoto);
-            var decodedPixelData = await decoder.GetPixelDataAsync(pixelFormat, alphaMode, new BitmapTransform(), ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
+                var originalPhoto = new InMemoryRandomAccessStream();
+                var reencodedPhoto = new InMemoryRandomAccessStream();
+                await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), originalPhoto);
+                await originalPhoto.FlushAsync();
 
-            // Reencode the image
-            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, capturedPhoto);
-            encoder.SetPixelData(pixelFormat, alphaMode, decoder.PixelWidth, decoder.PixelHeight, decoder.DpiX, decoder.DpiY, decodedPixelData.DetachPixelData());
-            await encoder.FlushAsync();
+                captureElement.Visibility = Visibility.Collapsed;
 
-            // Store the captured photo as a Win2D type for later use
-            // Note that this has to come before calls to Project Oxford
-            // Project Oxford appears to close the stream when it's finished with it, meaning Win2D can't access it
-            photoCanvasBitmap = await CanvasBitmap.LoadAsync(canvasControl, capturedPhoto);
+                // Project Oxford doesn't like the JPEG that CapturePhotoToStreamAsync creates
+                // It returns an "Image size is too small" error
+                // To workaround this, we have to decode the JPEG, and reencode it again using Windows.Graphics.Imaging
+                // Project Oxford successfully detects faces in the reencoded image
 
-            // Send the photo to Project Oxford to detect the faces
-            var faces = await faceServiceClient.DetectAsync(capturedPhoto.AsStreamForRead());
+                // Decode the image created by CapturePhotoToStreamAsync
+                BitmapPixelFormat pixelFormat = BitmapPixelFormat.Rgba8;
+                BitmapAlphaMode alphaMode = BitmapAlphaMode.Ignore;
+                var decoder = await BitmapDecoder.CreateAsync(originalPhoto);
+                var decodedPixelData = await decoder.GetPixelDataAsync(pixelFormat, alphaMode, new BitmapTransform(), ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
 
-            // Force the canvasControl to be redrawn now that the photo is available
-            canvasControl.Invalidate();
+                // Reencode the image
+                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, reencodedPhoto);
+                encoder.SetPixelData(pixelFormat, alphaMode, decoder.PixelWidth, decoder.PixelHeight, decoder.DpiX, decoder.DpiY, decodedPixelData.DetachPixelData());
+                await encoder.FlushAsync();
+
+                // Store the captured photo as a Win2D type for later use
+                // Note that this has to come before calls to Project Oxford
+                // Project Oxford appears to close the stream when it's finished with it, meaning Win2D can't access it
+                photoCanvasBitmap = await CanvasBitmap.LoadAsync(canvasControl, reencodedPhoto);
+
+                // Send the photo to Project Oxford to detect the faces
+                lastCapturedFaces = await faceServiceClient.DetectAsync(reencodedPhoto.AsStreamForRead(), true, true, true, false);
+
+                // Force the canvasControl to be redrawn now that the photo is available
+                canvasControl.Invalidate();
+
+                processingImage = false;
+            }
+            else
+            {
+                canvasControl.Visibility = Visibility.Collapsed;
+                captureElement.Visibility = Visibility.Visible;
+                AnalyzeButton.Content = "Restart";
+
+                photoCanvasBitmap = null;
+                canvasControl.Invalidate();
+
+                inCaptureState = true;
+            }
         }
 
         void canvasControl_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
+            CanvasTextFormat centeredTextFormat = new CanvasTextFormat();
+            centeredTextFormat.HorizontalAlignment = CanvasHorizontalAlignment.Center;
+            centeredTextFormat.VerticalAlignment = CanvasVerticalAlignment.Center;
+            centeredTextFormat.FontSize = 30;
+
             if (photoCanvasBitmap != null)
             {
                 CanvasRenderTarget tempRenderTarget = new CanvasRenderTarget(sender, photoCanvasBitmap.Size);
 
-                // Begin by drawing the captured photo into the temporary render target
                 using (CanvasDrawingSession ds = tempRenderTarget.CreateDrawingSession())
                 {
+                    // Begin by drawing the captured photo into the temporary render target
                     ds.DrawImage(photoCanvasBitmap, new System.Numerics.Vector2(0, 0));
+
+                    foreach (Face face in lastCapturedFaces)
+                    {
+                        Rect faceRect = new Rect(face.FaceRectangle.Left, face.FaceRectangle.Top, face.FaceRectangle.Width, face.FaceRectangle.Height);
+                        ds.DrawRectangle(faceRect, Colors.Red);
+
+                        CanvasPathBuilder pathBuilder = new CanvasPathBuilder(sender);
+                        Vector2 startingPoint = new Vector2((float)(faceRect.Left + faceRect.Width / 2), (float)faceRect.Top);
+                        pathBuilder.BeginFigure(startingPoint);
+                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), 10));
+                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), 50));
+                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), - 50));
+                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), - 10));
+                        pathBuilder.EndFigure(CanvasFigureLoop.Closed);
+
+                        // Draw the speech bubble above the face
+                        CanvasGeometry geometry = CanvasGeometry.CreatePath(pathBuilder);
+                        ds.FillGeometry(geometry, Colors.Yellow);
+
+                        // Draw the person's age and gender above the face
+                        String descString = face.Attributes.Gender.ToString() + ", " + face.Attributes.Age.ToString();
+                        ds.DrawText(descString, startingPoint - new Vector2(0, 30), Colors.Orange, centeredTextFormat);
+                    }
                 }
 
                 // End by drawing the rendertarget into the center of the screen
@@ -175,11 +236,10 @@ namespace Win2D_Face
                 Rect targetRect = new Rect((sender.RenderSize.Width - newWidth) / 2, (sender.RenderSize.Height - newHeight) / 2, newWidth, newHeight);
 
                 args.DrawingSession.DrawImage(tempRenderTarget, targetRect);
-                
             }
             else
             {
-                args.DrawingSession.DrawText("Processing...", (float)(sender.Size.Width / 2), (float)(sender.Size.Height / 2), Colors.White);
+                args.DrawingSession.DrawText("Processing...", (float)(sender.Size.Width / 2), (float)(sender.Size.Height / 2), Colors.White, centeredTextFormat);
             }
         }
 

@@ -142,7 +142,7 @@ namespace Win2D_Face
 
                 // Make the 'Processing...' label visible
                 canvasControl.Visibility = Visibility.Visible;
-                AnalyzeButton.Content = "Capture Photo";
+                AnalyzeButton.Content = "...";
 
                 canvasControl.Invalidate();
 
@@ -181,12 +181,13 @@ namespace Win2D_Face
                 canvasControl.Invalidate();
 
                 processingImage = false;
+                AnalyzeButton.Content = "Restart";
             }
             else
             {
                 canvasControl.Visibility = Visibility.Collapsed;
                 captureElement.Visibility = Visibility.Visible;
-                AnalyzeButton.Content = "Restart";
+                AnalyzeButton.Content = "Capture Photo";
 
                 photoCanvasBitmap = null;
                 canvasControl.Invalidate();
@@ -219,10 +220,10 @@ namespace Win2D_Face
                         CanvasPathBuilder pathBuilder = new CanvasPathBuilder(sender);
                         Vector2 startingPoint = new Vector2((float)(faceRect.Left + faceRect.Width / 2), (float)faceRect.Top);
                         pathBuilder.BeginFigure(startingPoint);
-                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), 10));
-                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), 50));
-                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), - 50));
-                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(50.0f, (float)faceRect.Width / 2), - 10));
+                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(70.0f, (float)faceRect.Width / 2), 10));
+                        pathBuilder.AddLine(startingPoint - new Vector2(Math.Max(70.0f, (float)faceRect.Width / 2), 50));
+                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(70.0f, (float)faceRect.Width / 2), - 50));
+                        pathBuilder.AddLine(startingPoint + new Vector2(Math.Max(70.0f, (float)faceRect.Width / 2), - 10));
                         pathBuilder.EndFigure(CanvasFigureLoop.Closed);
 
                         // Draw the speech bubble above the face

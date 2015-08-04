@@ -99,7 +99,6 @@ namespace Win2D_Face
             var settings = new MediaCaptureInitializationSettings()
             {
                 StreamingCaptureMode = StreamingCaptureMode.Video
-
             };
 
             // Pick the back camera if one exists
@@ -179,32 +178,15 @@ namespace Win2D_Face
                 var reencodedPhoto = new InMemoryRandomAccessStream();
                 await mediaCapture.CapturePhotoToStreamAsync(ImageEncodingProperties.CreateJpeg(), originalPhoto);
                 await originalPhoto.FlushAsync();
+                originalPhoto.Seek(0);
 
                 captureElement.Visibility = Visibility.Collapsed;
 
-                // Project Oxford doesn't like the JPEG that CapturePhotoToStreamAsync creates
-                // It returns an "Image size is too small" error
-                // To workaround this, we have to decode the JPEG, and reencode it again using Windows.Graphics.Imaging
-                // Project Oxford successfully detects faces in the reencoded image
-
-                // Decode the image created by CapturePhotoToStreamAsync
-                BitmapPixelFormat pixelFormat = BitmapPixelFormat.Rgba8;
-                BitmapAlphaMode alphaMode = BitmapAlphaMode.Ignore;
-                var decoder = await BitmapDecoder.CreateAsync(originalPhoto);
-                var decodedPixelData = await decoder.GetPixelDataAsync(pixelFormat, alphaMode, new BitmapTransform(), ExifOrientationMode.RespectExifOrientation, ColorManagementMode.DoNotColorManage);
-
-                // Reencode the image
-                var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, reencodedPhoto);
-                encoder.SetPixelData(pixelFormat, alphaMode, decoder.PixelWidth, decoder.PixelHeight, decoder.DpiX, decoder.DpiY, decodedPixelData.DetachPixelData());
-                await encoder.FlushAsync();
-
                 // Store the captured photo as a Win2D type for later use
-                // Note that this has to come before calls to Project Oxford
-                // Project Oxford appears to close the stream when it's finished with it, meaning Win2D can't access it
-                photoCanvasBitmap = await CanvasBitmap.LoadAsync(canvasControl, reencodedPhoto);
+                photoCanvasBitmap = await CanvasBitmap.LoadAsync(canvasControl, originalPhoto);
 
                 // Send the photo to Project Oxford to detect the faces
-                lastCapturedFaces = await faceServiceClient.DetectAsync(reencodedPhoto.AsStreamForRead(), true, true, true, false);
+                lastCapturedFaces = await faceServiceClient.DetectAsync(originalPhoto.AsStreamForRead(), true, true, true, false);
 
                 // Force the canvasControl to be redrawn now that the photo is available
                 canvasControl.Invalidate();

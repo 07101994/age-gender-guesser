@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win2D-Face", "Win2D-Face.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientLibrary", "ClientLibrary\ClientLibrary.csproj", "{34DAA01D-3F6B-4622-9425-726B0B4A6C78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EffectsRuntimeComponent", "..\EffectsRuntimeComponent\EffectsRuntimeComponent.csproj", "{3B259618-9FF8-4448-8338-34A55F8F067E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,22 @@ Global
 		{34DAA01D-3F6B-4622-9425-726B0B4A6C78}.Release|x64.Build.0 = Release|Any CPU
 		{34DAA01D-3F6B-4622-9425-726B0B4A6C78}.Release|x86.ActiveCfg = Release|Any CPU
 		{34DAA01D-3F6B-4622-9425-726B0B4A6C78}.Release|x86.Build.0 = Release|Any CPU
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|ARM.ActiveCfg = Debug|ARM
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|ARM.Build.0 = Debug|ARM
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|x64.ActiveCfg = Debug|x64
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|x64.Build.0 = Debug|x64
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|x86.ActiveCfg = Debug|x86
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Debug|x86.Build.0 = Debug|x86
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|ARM.ActiveCfg = Release|ARM
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|ARM.Build.0 = Release|ARM
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|x64.ActiveCfg = Release|x64
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|x64.Build.0 = Release|x64
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|x86.ActiveCfg = Release|x86
+		{3B259618-9FF8-4448-8338-34A55F8F067E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

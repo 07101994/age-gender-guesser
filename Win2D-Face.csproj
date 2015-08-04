@@ -134,10 +134,19 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EffectsRuntimeComponent\EffectsRuntimeComponent.csproj">
+      <Project>{3b259618-9ff8-4448-8338-34a55f8f067e}</Project>
+      <Name>EffectsRuntimeComponent</Name>
+    </ProjectReference>
     <ProjectReference Include="ClientLibrary\ClientLibrary.csproj">
       <Project>{34daa01d-3f6b-4622-9425-726b0b4a6c78}</Project>
       <Name>ClientLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="WindowsMobile, Version=10.0.10240.0">
+      <Name>Windows Mobile Extensions for the UWP</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

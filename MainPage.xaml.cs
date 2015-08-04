@@ -103,22 +103,21 @@ namespace Win2D_Face
             catch (Exception)
             {
                 this.progressText.Text = "No camera is available.";
-
                 return;
             }
 
             captureElement.Source = mediaCapture;
             await mediaCapture.StartPreviewAsync();
 
+            // Limit the photo capture to be a reasonable size
             var photoStreamProperties = mediaCapture.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.Photo);
             IMediaEncodingProperties mediaEncodingProperties = null;
-
             foreach (var photoStreamProperty in photoStreamProperties)
             {
                 var videoEncodingProperties = (photoStreamProperty as VideoEncodingProperties);
                 if (videoEncodingProperties != null)
                 {
-                    if (videoEncodingProperties.Width * videoEncodingProperties.Height * 4 <= 4 * 640 * 480)
+                    if (videoEncodingProperties.Width * videoEncodingProperties.Height <= 2048 * 1024)
                     {
                         mediaEncodingProperties = photoStreamProperty;
                     }

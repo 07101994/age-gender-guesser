@@ -76,6 +76,13 @@ namespace Win2D_Face
             this.captureElement.Visibility = Visibility.Visible;
 
             hasLoaded.SetResult(null);
+
+            bool isStatusBarAPIPresent = Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.UI.ViewManagement.StatusBar");
+
+            if (isStatusBarAPIPresent)
+            {
+                await StatusBar.GetForCurrentView().HideAsync();
+            }
         }
 
         private async Task CreateMediaCapture()

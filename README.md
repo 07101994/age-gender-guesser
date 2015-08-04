@@ -1,12 +1,9 @@
 # Age & Gender guesser for Windows 10
 
 ### What is this?
-This is a Windows 10 app that will guess the age and gender of anybody in a photo. It uses the [Project Oxford API](https://www.projectoxford.ai/) for face recognition and age/gender guessing. It uses [Win2D](https://github.com/microsoft/win2d) for its graphics rendering.
+Use this to find out somebody's age and gender! Simply take a photograph using your Windows 10 device's camera, and for each person in the photograph the app will guess their age and gender and draw it above their face. It is very similar to www.how-old.net.
 
-### Why is this interesting?
-This app shows a simple use-case of Win2D and the new [camera interop](https://msdn.microsoft.com/library/windows.media.effects.ibasicvideoeffect) available in Windows 10. It runs on the Universal Windows Platform, so works on desktop PCs, phones, and much more!
-
-It also demonstrates how to use Project Oxford in a Windows 10 application.
+This is a Windows 10 application written for the Universal Windows Platform. It uses the [Project Oxford API](https://www.projectoxford.ai/) for face recognition and age/gender guessing. It uses [Win2D](https://github.com/microsoft/win2d) for its graphics rendering. It makes use of the new [camera video effects](https://msdn.microsoft.com/library/windows.media.effects.ibasicvideoeffect) added to Windows 10, and the interop available between the camera and Win2D.
 
 ### How do I run it?
 

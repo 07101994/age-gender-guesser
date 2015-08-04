@@ -143,6 +143,17 @@ namespace Win2D_Face
             }
 
             await mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.Photo, mediaEncodingProperties);
+
+            if (settings.VideoDeviceId == "")
+            {
+                // If we didn't find a back camera, and the camera we defaulted to is a front camera, then mirror the content
+                DeviceInformation info = devices[0];
+                if (info.EnclosureLocation.Panel == Windows.Devices.Enumeration.Panel.Front)
+                {
+                    await mediaCapture.AddVideoEffectAsync(new VideoEffectDefinition(typeof(MirrorEffect).FullName, new PropertySet()), MediaStreamType.VideoPreview);
+                    await mediaCapture.AddVideoEffectAsync(new VideoEffectDefinition(typeof(MirrorEffect).FullName, new PropertySet()), MediaStreamType.Photo);
+                }
+            }
         }
 
         private async void AnalyzeButton_Click(object sender, RoutedEventArgs e)

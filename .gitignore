@@ -15,7 +15,8 @@ Packages/
 *.suo
 *.vsglog
 *.tlog
-*.json.lock
+*.lock.json
+*.csproj.user
 
 #Eclipse stuff
 .settings/

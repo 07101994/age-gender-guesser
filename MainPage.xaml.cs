@@ -27,6 +27,12 @@ using Windows.UI;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.Geometry;
 using System.Numerics;
+using Windows.Media.Effects;
+
+using EffectsRuntimeComponent;
+using Windows.Graphics.Display;
+using Windows.Devices.Enumeration;
+using Windows.UI.ViewManagement;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 

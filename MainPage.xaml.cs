@@ -102,6 +102,18 @@ namespace Win2D_Face
 
             };
 
+            // Pick the back camera if one exists
+            DeviceInformationCollection devices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
+            foreach (var device in devices)
+            {
+                // Check if the device on the requested panel supports Video Profile
+                if (device.EnclosureLocation.Panel == Windows.Devices.Enumeration.Panel.Back)
+                {
+                    settings.VideoDeviceId = device.Id;
+                    break;
+                }
+            }
+
             try
             {
                 await mediaCapture.InitializeAsync(settings);

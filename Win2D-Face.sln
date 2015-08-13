@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win2D-Face", "Win2D-Face.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientLibrary", "ClientLibrary\ClientLibrary.csproj", "{34DAA01D-3F6B-4622-9425-726B0B4A6C78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EffectsRuntimeComponent", "..\EffectsRuntimeComponent\EffectsRuntimeComponent.csproj", "{3B259618-9FF8-4448-8338-34A55F8F067E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EffectsRuntimeComponent", "EffectsRuntimeComponent\EffectsRuntimeComponent.csproj", "{3B259618-9FF8-4448-8338-34A55F8F067E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
